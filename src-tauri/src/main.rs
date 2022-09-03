@@ -4,7 +4,7 @@
 )]
 
 use crate::domain::CountByNoun;
-use tauri::{command, generate_context, generate_handler};
+use tauri::{command, generate_context, generate_handler, Builder};
 
 mod domain;
 mod usecase;
@@ -18,7 +18,7 @@ fn count_by_noun(text: String) -> Result<Vec<CountByNoun>, String> {
 }
 
 fn main() {
-    tauri::Builder::default()
+    Builder::default()
         .invoke_handler(generate_handler![count_by_noun])
         .run(generate_context!())
         .expect("error while running tauri application");
