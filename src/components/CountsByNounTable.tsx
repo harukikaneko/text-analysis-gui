@@ -1,4 +1,4 @@
-import { css } from "@emotion/react";
+import { Table } from "@nextui-org/react";
 import { CountsByNoun } from "../types/noun";
 
 interface Props {
@@ -6,33 +6,25 @@ interface Props {
 }
 
 export const CountsByNounTable: React.FC<Props> = (props) => (
-  <table
-    css={css`
-      width: 100%;
-      text-align: center;
-      border-spacing: 0;
-      border-radius: 8px;
-      border: 1px solid transparent;
-      color: #353535;
-      background-color: #ffffff;
-      box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
-      outline: none;
-      padding: 10px;
-    `}
+  <Table
+    compact
+    aria-label="counts by noun table"
+    css={{
+      height: "auto",
+      minWidth: "100%",
+    }}
   >
-    <thead>
-      <tr>
-        <th>nouns</th>
-        <th>count</th>
-      </tr>
-    </thead>
-    <tbody>
+    <Table.Header>
+      <Table.Column align={"center"}>nouns</Table.Column>
+      <Table.Column align={"center"}>counts</Table.Column>
+    </Table.Header>
+    <Table.Body>
       {props.countsByNoun.map((item, index) => (
-        <tr key={index}>
-          <td>{item.noun}</td>
-          <td>{item.counts}</td>
-        </tr>
+        <Table.Row key={index}>
+          <Table.Cell>{item.noun}</Table.Cell>
+          <Table.Cell>{item.counts}</Table.Cell>
+        </Table.Row>
       ))}
-    </tbody>
-  </table>
+    </Table.Body>
+  </Table>
 );

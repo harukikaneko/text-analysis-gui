@@ -42,25 +42,6 @@ const App: React.FC = () => {
       >
         Lets Text Analysis
       </h1>
-
-      <div
-        css={css`
-          display: flex;
-          justify-content: center;
-        `}
-      >
-        <div>
-          <TextInput
-            placeholder="Enter a text..."
-            handleOnChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setText(e.currentTarget.value)
-            }
-          />
-          <Button text="Analysis" onClick={count_by_noun} />
-        </div>
-      </div>
-
-      <CountsByNounTable countsByNoun={countsByNoun} />
     </div>
   );
 };
