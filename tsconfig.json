@@ -13,6 +13,7 @@
     "module": "esnext",
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "jsxImportSource": "@emotion/react",
     "jsx": "preserve"
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
