@@ -11,7 +11,7 @@ impl Tokens {
             self.0
                 .into_iter()
                 .filter(|x| Detail(x.detail.clone()).is_nouns())
-                .map(|nouns| Noun(nouns.text.into()))
+                .map(|nouns| Noun(nouns.text))
                 .collect_vec(),
         )
     }
