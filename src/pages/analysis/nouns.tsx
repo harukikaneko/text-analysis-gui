@@ -6,8 +6,9 @@ import { Button } from "../../components/atoms/Button";
 import { TextInput } from "../../components/atoms/TextInput";
 import { CountsByNounTable } from "../../components/CountsByNounTable";
 import { CountsByNoun } from "../../types/noun";
+import { NextPage } from 'next'
 
-const Nouns: React.FC = () => {
+const Nouns: NextPage = () => {
   const [countsByNoun, setCountsByNoun] = useState<CountsByNoun[]>([]);
   const [text, setText] = useState("");
   const [isLoading, setLoading] = useState(false);
