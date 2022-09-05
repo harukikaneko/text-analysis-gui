@@ -1,12 +1,11 @@
 use itertools::Itertools;
-use lindera::tokenizer::Token;
 
 use super::{Noun, Nouns};
 
-#[derive(Clone)]
-pub struct Tokens<'a>(pub Vec<Token<'a>>);
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct Tokens(pub Vec<Token>);
 
-impl Tokens<'_> {
+impl Tokens {
     pub fn exclude_non_nouns(self) -> Nouns {
         Nouns(
             self.0
@@ -16,6 +15,12 @@ impl Tokens<'_> {
                 .collect_vec(),
         )
     }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct Token {
+    pub text: String,
+    pub detail: Vec<String>,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -34,11 +39,11 @@ mod test {
     #[test]
     fn test_exclude_non_nouns() {
         let token = Token {
-            text: "東京スカイツリー",
+            text: "東京スカイツリー".into(),
             detail: vec!["名詞".into()],
         };
         let exclude_token = Token {
-            text: "の",
+            text: "の".into(),
             detail: vec!["助詞".into()],
         };
         let tokens = Tokens(vec![token, exclude_token]);

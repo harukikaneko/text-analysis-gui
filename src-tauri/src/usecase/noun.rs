@@ -1,24 +1,7 @@
-use std::path::PathBuf;
-
 use crate::domain::{CountsByNoun, CountsOfNounsByYear, TextWithYears, Tokens};
-use lindera::{
-    mode::Mode,
-    tokenizer::{
-        DictionaryConfig, DictionaryKind, DictionarySourceType, Tokenizer, TokenizerConfig,
-        UserDictionaryConfig,
-    },
-    LinderaResult,
-};
+use lindera::LinderaResult;
 
-pub fn aggregate_group_by_noun(
-    word: String,
-    dictionary_path: Option<String>,
-    user_dictionary: Option<String>,
-) -> LinderaResult<Vec<CountsByNoun>> {
-    let config = setup(dictionary_path, user_dictionary);
-
-    let tokenizer = Tokenizer::with_config(config)?;
-    let tokens = Tokens(tokenizer.tokenize(&word)?);
+pub fn aggregate_group_by_noun(tokens: Tokens) -> LinderaResult<Vec<CountsByNoun>> {
     let exclude_non_nouns = tokens.exclude_non_nouns();
     Ok(exclude_non_nouns.aggregate_group_by_word())
 }
@@ -29,65 +12,32 @@ pub fn aggregate_counts_of_nouns_by_year(
     todo!()
 }
 
-#[mry::mry]
-fn setup(dictionary_path: Option<String>, user_dictionary: Option<String>) -> TokenizerConfig {
-    let mut dictionary = DictionaryConfig {
-        kind: DictionaryKind::IPADIC,
-        path: None,
-    };
-
-    if let Some(dict_path) = dictionary_path {
-        dictionary.path = Some(PathBuf::from(dict_path))
-    }
-
-    let mut config = TokenizerConfig {
-        dictionary,
-        mode: Mode::Normal,
-        user_dictionary: None,
-    };
-
-    if let Some(user_dict_path) = user_dictionary {
-        let user_dictionary = Some(UserDictionaryConfig {
-            kind: DictionaryKind::IPADIC,
-            source_type: DictionarySourceType::Csv,
-            path: PathBuf::from(user_dict_path),
-        });
-
-        config.user_dictionary = user_dictionary
-    }
-
-    config
-}
-
 #[cfg(test)]
 mod test {
-    use crate::domain::Noun;
+    use crate::domain::{Noun, Token};
 
     use super::*;
 
     #[test]
-    #[mry::lock(setup)]
     fn test_aggregate_group_by_noun() {
-        let word = "東京は".into();
+        let token = Token {
+            text: "東京スカイツリー".into(),
+            detail: vec!["名詞".into()],
+        };
+
+        let exclude_token = Token {
+            text: "の".into(),
+            detail: vec!["助詞".into()],
+        };
+
+        let tokens = Tokens(vec![token, exclude_token]);
+
         let expected = vec![CountsByNoun {
-            noun: Noun("東京".into()),
+            noun: Noun("東京スカイツリー".into()),
             counts: 1,
         }];
 
-        let dictionary = DictionaryConfig {
-            kind: DictionaryKind::IPADIC,
-            path: None,
-        };
-
-        let config = TokenizerConfig {
-            dictionary,
-            mode: Mode::Normal,
-            user_dictionary: None,
-        };
-
-        mock_setup(None, None).returns(config);
-
-        let actual = aggregate_group_by_noun(word, None, None).unwrap();
+        let actual = aggregate_group_by_noun(tokens).unwrap();
         assert_eq!(actual, expected)
     }
 }

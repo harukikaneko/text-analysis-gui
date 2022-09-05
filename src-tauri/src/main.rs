@@ -6,6 +6,7 @@
 use domain::{CountsByNoun, CountsOfNounsByYear, TextWithYears};
 use tauri::{command, generate_context, generate_handler, Builder};
 
+mod config;
 mod domain;
 mod usecase;
 
@@ -15,7 +16,11 @@ fn counts_by_noun(
     dictionary_path: Option<String>,
     user_dictionary: Option<String>,
 ) -> Result<Vec<CountsByNoun>, String> {
-    match usecase::noun::aggregate_group_by_noun(text, dictionary_path, user_dictionary) {
+    let tokens = match usecase::token::get_tokens(text, dictionary_path, user_dictionary) {
+        Ok(tokens) => tokens,
+        Err(err) => return Err(format!("failed to tokens {}", err)),
+    };
+    match usecase::noun::aggregate_group_by_noun(tokens) {
         Ok(items) => Ok(items),
         Err(err) => Err(format!("failed to {}", err)),
     }
