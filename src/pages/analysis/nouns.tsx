@@ -7,15 +7,22 @@ import { TextInput } from "../../components/atoms/TextInput";
 import { CountsByNounTable } from "../../components/CountsByNounTable";
 import { CountsByNoun } from "../../types/noun";
 import { NextPage } from "next";
+import { open } from "@tauri-apps/api/dialog";
 
 const Nouns: NextPage = () => {
   const [countsByNoun, setCountsByNoun] = useState<CountsByNoun[]>([]);
   const [text, setText] = useState("");
   const [isLoading, setLoading] = useState(false);
+  const [dictionaryPath, setDictionaryPath] = useState<
+    string | string[] | null
+  >(null);
+  const [userDictionaryPath, setUserDictionaryPath] = useState<
+    string | string[] | null
+  >(null);
 
   const count_by_noun = async () => {
     setLoading(true);
-    await invoke("count_by_noun", { text })
+    await invoke("count_by_noun", { text, dictionaryPath, userDictionaryPath })
       .then((result: CountsByNoun[]) => {
         setCountsByNoun(result.sort((a, b) => b.counts - a.counts));
         setLoading(false);
@@ -24,6 +31,18 @@ const Nouns: NextPage = () => {
         console.error("count_by_noun", err);
         setLoading(false);
       });
+  };
+
+  const selectDictionaryPath = async () => {
+    const path = await open({ directory: true });
+    setDictionaryPath(path);
+  };
+
+  const selectUserDictionaryPath = async () => {
+    const path = await open({
+      filters: [{ name: "Csv", extensions: ["csv"] }],
+    });
+    setUserDictionaryPath(path);
   };
 
   return (
@@ -63,6 +82,8 @@ const Nouns: NextPage = () => {
             }
           />
           <Button text="Analysis" onClick={count_by_noun} />
+          <Button text="Dictionary" onClick={selectDictionaryPath} />
+          <Button text="UserDictionary" onClick={selectUserDictionaryPath} />
         </div>
       </div>
 

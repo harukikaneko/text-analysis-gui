@@ -1,7 +1,7 @@
 import { css } from "@emotion/react";
 
 interface Props {
-  onClick: () => Promise<void>;
+  onClick: () => Promise<void> | void;
   text: string;
 }
 
