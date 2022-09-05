@@ -18,11 +18,11 @@ impl Tokens<'_> {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Detail(Vec<String>);
 
 impl Detail {
-    pub fn is_nouns(self) -> bool {
+    pub fn is_nouns(&self) -> bool {
         self.0.contains(&"名詞".to_string()) || self.0.contains(&"カスタム名詞".to_string())
     }
 }
@@ -49,12 +49,12 @@ mod test {
     #[test]
     fn test_is_nouns() {
         let detail = Detail(vec!["名詞".into()]);
-        assert_eq!(detail.is_nouns(), true)
+        assert!(detail.is_nouns())
     }
 
     #[test]
     fn test_is_not_nouns() {
         let detail = Detail(vec!["助詞".into()]);
-        assert_eq!(detail.is_nouns(), false)
+        assert!(!detail.is_nouns())
     }
 }

@@ -3,12 +3,19 @@ use std::path::PathBuf;
 use crate::domain::{CountByNoun, Tokens};
 use lindera::{
     mode::Mode,
-    tokenizer::{DictionaryConfig, DictionaryKind, Tokenizer, TokenizerConfig},
+    tokenizer::{
+        DictionaryConfig, DictionaryKind, DictionarySourceType, Tokenizer, TokenizerConfig,
+        UserDictionaryConfig,
+    },
     LinderaResult,
 };
 
-pub fn aggregate_group_by_noun(word: String) -> LinderaResult<Vec<CountByNoun>> {
-    let config = setup_ipadic_neologd();
+pub fn aggregate_group_by_noun(
+    word: String,
+    dictionary_path: Option<String>,
+    user_dictionary: Option<String>,
+) -> LinderaResult<Vec<CountByNoun>> {
+    let config = setup(dictionary_path, user_dictionary);
 
     let tokenizer = Tokenizer::with_config(config)?;
     let tokens = Tokens(tokenizer.tokenize(&word)?);
@@ -17,19 +24,34 @@ pub fn aggregate_group_by_noun(word: String) -> LinderaResult<Vec<CountByNoun>> 
 }
 
 #[mry::mry]
-fn setup_ipadic_neologd() -> TokenizerConfig {
-    let dictionary = DictionaryConfig {
+fn setup(
+    dictionary_path: Option<String>,
+    user_dictionary: Option<String>,
+) -> TokenizerConfig {
+    let mut dictionary = DictionaryConfig {
         kind: DictionaryKind::IPADIC,
-        path: Some(PathBuf::from(
-            "./src/resource/lindera-ipadic-2.7.0-20070801-neologd-20200910",
-        )),
+        path: None,
     };
 
-    let config = TokenizerConfig {
+    if let Some(dict_path) = dictionary_path {
+        dictionary.path = Some(PathBuf::from(dict_path))
+    }
+
+    let mut config = TokenizerConfig {
         dictionary,
         mode: Mode::Normal,
         user_dictionary: None,
     };
+
+    if let Some(user_dict_path) = user_dictionary {
+        let user_dictionary = Some(UserDictionaryConfig {
+            kind: DictionaryKind::IPADIC,
+            source_type: DictionarySourceType::Csv,
+            path: PathBuf::from(user_dict_path),
+        });
+
+        config.user_dictionary = user_dictionary
+    }
 
     config
 }
@@ -41,7 +63,7 @@ mod test {
     use super::*;
 
     #[test]
-    #[mry::lock(setup_ipadic_neologd)]
+    #[mry::lock(setup)]
     fn test_aggregate_group_by_noun() {
         let word = "東京は".into();
         let expected = vec![CountByNoun {
@@ -60,9 +82,9 @@ mod test {
             user_dictionary: None,
         };
 
-        mock_setup_ipadic_neologd().returns(config);
+        mock_setup(None, None).returns(config);
 
-        let actual = aggregate_group_by_noun(word).unwrap();
+        let actual = aggregate_group_by_noun(word, None, None).unwrap();
         assert_eq!(actual, expected)
     }
 }

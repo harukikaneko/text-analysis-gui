@@ -1,7 +1,7 @@
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Nouns(pub Vec<Noun>);
 
 impl Nouns {
@@ -23,7 +23,7 @@ impl Nouns {
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Hash, Eq)]
 pub struct Noun(pub String);
 
-#[derive(Debug, Deserialize, Serialize, Clone, PartialEq)]
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq)]
 pub struct CountByNoun {
     pub noun: Noun,
     pub counts: usize,

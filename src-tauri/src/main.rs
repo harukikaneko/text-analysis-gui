@@ -10,8 +10,12 @@ mod domain;
 mod usecase;
 
 #[command]
-fn count_by_noun(text: String) -> Result<Vec<CountByNoun>, String> {
-    match usecase::text_toknizer::aggregate_group_by_noun(text) {
+fn count_by_noun(
+    text: String,
+    dictionary_path: Option<String>,
+    user_dictionary: Option<String>,
+) -> Result<Vec<CountByNoun>, String> {
+    match usecase::text_toknizer::aggregate_group_by_noun(text, dictionary_path, user_dictionary) {
         Ok(items) => Ok(items),
         Err(err) => Err(format!("failed to {}", err)),
     }
