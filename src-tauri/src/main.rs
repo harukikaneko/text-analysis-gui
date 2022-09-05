@@ -3,19 +3,29 @@
     windows_subsystem = "windows"
 )]
 
-use crate::domain::CountByNoun;
+use domain::{CountsByNoun, CountsOfNounsByYear, TextWithYears};
 use tauri::{command, generate_context, generate_handler, Builder};
 
 mod domain;
 mod usecase;
 
 #[command]
-fn count_by_noun(
+fn counts_by_noun(
     text: String,
     dictionary_path: Option<String>,
     user_dictionary: Option<String>,
-) -> Result<Vec<CountByNoun>, String> {
-    match usecase::text_toknizer::aggregate_group_by_noun(text, dictionary_path, user_dictionary) {
+) -> Result<Vec<CountsByNoun>, String> {
+    match usecase::noun::aggregate_group_by_noun(text, dictionary_path, user_dictionary) {
+        Ok(items) => Ok(items),
+        Err(err) => Err(format!("failed to {}", err)),
+    }
+}
+
+#[command]
+fn counts_of_nouns_by_year(
+    aggregate_target: TextWithYears,
+) -> Result<Vec<CountsOfNounsByYear>, String> {
+    match usecase::noun::aggregate_counts_of_nouns_by_year(aggregate_target) {
         Ok(items) => Ok(items),
         Err(err) => Err(format!("failed to {}", err)),
     }
@@ -23,7 +33,7 @@ fn count_by_noun(
 
 fn main() {
     Builder::default()
-        .invoke_handler(generate_handler![count_by_noun])
+        .invoke_handler(generate_handler![counts_by_noun, counts_of_nouns_by_year])
         .run(generate_context!())
         .expect("error while running tauri application");
 }

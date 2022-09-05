@@ -5,13 +5,13 @@ use serde::{Deserialize, Serialize};
 pub struct Nouns(pub Vec<Noun>);
 
 impl Nouns {
-    pub fn aggregate_group_by_word(self) -> Vec<CountByNoun> {
+    pub fn aggregate_group_by_word(self) -> Vec<CountsByNoun> {
         self.0
             .into_iter()
             .into_group_map_by(|word| word.to_owned())
             .into_iter()
-            .map(|(key, values)| -> CountByNoun {
-                CountByNoun {
+            .map(|(key, values)| -> CountsByNoun {
+                CountsByNoun {
                     noun: key,
                     counts: values.len(),
                 }
@@ -20,17 +20,8 @@ impl Nouns {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Hash, Eq)]
-pub struct Noun(pub String);
-
-#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq)]
-pub struct CountByNoun {
-    pub noun: Noun,
-    pub counts: usize,
-}
-
 #[cfg(test)]
-mod test {
+mod nouns_test {
     use super::*;
 
     #[test]
@@ -40,10 +31,25 @@ mod test {
             Noun("東京スカイツリー".into()),
         ]);
 
-        let expected = vec![CountByNoun {
+        let expected = vec![CountsByNoun {
             noun: Noun("東京スカイツリー".into()),
             counts: 2,
         }];
         assert_eq!(nouns.aggregate_group_by_word(), expected)
     }
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Hash, Eq)]
+pub struct Noun(pub String);
+
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq)]
+pub struct CountsByNoun {
+    pub noun: Noun,
+    pub counts: usize,
+}
+
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq)]
+pub struct CountsOfNounsByYear {
+    pub year: usize,
+    pub nouns: Vec<CountsByNoun>,
 }

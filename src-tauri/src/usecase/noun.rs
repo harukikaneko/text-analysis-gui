@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 
-use crate::domain::{CountByNoun, Tokens};
+use crate::domain::{CountsByNoun, CountsOfNounsByYear, TextWithYears, Tokens};
 use lindera::{
     mode::Mode,
     tokenizer::{
@@ -14,7 +14,7 @@ pub fn aggregate_group_by_noun(
     word: String,
     dictionary_path: Option<String>,
     user_dictionary: Option<String>,
-) -> LinderaResult<Vec<CountByNoun>> {
+) -> LinderaResult<Vec<CountsByNoun>> {
     let config = setup(dictionary_path, user_dictionary);
 
     let tokenizer = Tokenizer::with_config(config)?;
@@ -23,11 +23,14 @@ pub fn aggregate_group_by_noun(
     Ok(exclude_non_nouns.aggregate_group_by_word())
 }
 
+pub fn aggregate_counts_of_nouns_by_year(
+    _aggregate_target: TextWithYears,
+) -> LinderaResult<Vec<CountsOfNounsByYear>> {
+    todo!()
+}
+
 #[mry::mry]
-fn setup(
-    dictionary_path: Option<String>,
-    user_dictionary: Option<String>,
-) -> TokenizerConfig {
+fn setup(dictionary_path: Option<String>, user_dictionary: Option<String>) -> TokenizerConfig {
     let mut dictionary = DictionaryConfig {
         kind: DictionaryKind::IPADIC,
         path: None,
@@ -66,7 +69,7 @@ mod test {
     #[mry::lock(setup)]
     fn test_aggregate_group_by_noun() {
         let word = "東京は".into();
-        let expected = vec![CountByNoun {
+        let expected = vec![CountsByNoun {
             noun: Noun("東京".into()),
             counts: 1,
         }];
