@@ -82,8 +82,8 @@ const Nouns: NextPage = () => {
             }
           />
           <Button text="Analysis" onClick={count_by_noun} />
-          <Button text="Dictionary" onClick={selectDictionaryPath} />
-          <Button text="UserDictionary" onClick={selectUserDictionaryPath} />
+          <Button text="Set Dictionary" onClick={selectDictionaryPath} />
+          <Button text="Set UserDictionary" onClick={selectUserDictionaryPath} />
         </div>
       </div>
 
