@@ -22,13 +22,13 @@ const Nouns: NextPage = () => {
 
   const count_by_noun = async () => {
     setLoading(true);
-    await invoke("count_by_noun", { text, dictionaryPath, userDictionaryPath })
+    await invoke("counts_by_noun", { text, dictionaryPath, userDictionaryPath })
       .then((result: CountsByNoun[]) => {
         setCountsByNoun(result.sort((a, b) => b.counts - a.counts));
         setLoading(false);
       })
       .catch((err) => {
-        console.error("count_by_noun", err);
+        console.error("counts_by_noun", err);
         setLoading(false);
       });
   };
