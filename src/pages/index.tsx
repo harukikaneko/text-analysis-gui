@@ -7,7 +7,6 @@ interface CountsByNoun {
 }
 
 const App: NextPage = () => {
-
   return (
     <div
       css={css`

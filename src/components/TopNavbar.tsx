@@ -22,7 +22,7 @@ export const TopNavbar: React.FC = () => (
           </Dropdown.Button>
         </Navbar.Item>
         <Dropdown.Menu
-          aria-label="ACME features"
+          aria-label="analysis"
           css={{
             $$dropdownMenuWidth: "340px",
             $$dropdownItemHeight: "70px",
@@ -44,10 +44,9 @@ export const TopNavbar: React.FC = () => (
           <Dropdown.Item
             key="autoscaling"
             showFullDescription
-            description="text analysis. counts by noun"
             icon={icons.nouns}
           >
-            <Link href="/analysis/nouns">Nouns</Link>
+            <Link href="/analysis/nouns">Count by Noun</Link>
           </Dropdown.Item>
         </Dropdown.Menu>
       </Dropdown>
