@@ -21,7 +21,7 @@ pub fn aggregate_counts_of_nouns_by_year(
 
 #[cfg(test)]
 mod test {
-    use crate::domain::{Noun, Token};
+    use crate::domain::{Detail, Noun, Token};
 
     use super::*;
 
@@ -29,12 +29,12 @@ mod test {
     fn test_aggregate_group_by_noun() {
         let token = Token {
             text: "東京スカイツリー".into(),
-            detail: vec!["名詞".into()],
+            detail: Detail(vec!["名詞".into()]),
         };
 
         let exclude_token = Token {
             text: "の".into(),
-            detail: vec!["助詞".into()],
+            detail: Detail(vec!["助詞".into()]),
         };
 
         let tokens = Tokens(vec![token, exclude_token]);
@@ -52,12 +52,12 @@ mod test {
     fn test_aggregate_counts_of_nouns_by_year() {
         let token = Token {
             text: "東京スカイツリー".into(),
-            detail: vec!["名詞".into()],
+            detail: Detail(vec!["名詞".into()]),
         };
 
         let exclude_token = Token {
             text: "の".into(),
-            detail: vec!["助詞".into()],
+            detail: Detail(vec!["助詞".into()]),
         };
 
         let tokens = vec![
