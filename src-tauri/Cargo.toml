@@ -20,6 +20,9 @@ tauri = { version = "1.0.5", features = ["api-all"] }
 lindera = "0.14.0"
 mry = "0.2.5"
 itertools = "0.10.3"
+futures = "0.3.24"
+anyhow = "1.0.64"
+tokio = { version = "1.21.0", features = ["full"] }
 
 [features]
 # by default Tauri runs in production mode
