@@ -1,0 +1,8 @@
+{
+  "extends": "next/core-web-vitals",
+  "plugins": ["@emotion"],
+  "rules": {
+    "@emotion/pkg-renaming": "error",
+    "react/no-unknown-property": ["error", { "ignore": ["css"] }]
+  }
+}
