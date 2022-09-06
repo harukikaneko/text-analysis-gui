@@ -43,7 +43,7 @@ async fn counts_of_nouns_by_year(
         })
         .collect_vec();
     let aggregate_target = match try_join_all(handles).await {
-        Ok(v) => v.into_iter().map(|v| v).collect_vec(),
+        Ok(v) => v.into_iter().collect_vec(),
         Err(err) => return Err(format!("failed to tokens {}", err)),
     };
     match usecase::noun::aggregate_counts_of_nouns_by_year(aggregate_target) {
