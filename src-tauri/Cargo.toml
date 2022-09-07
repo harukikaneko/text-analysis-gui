@@ -23,6 +23,7 @@ itertools = "0.10.3"
 futures = "0.3.24"
 anyhow = "1.0.64"
 tokio = { version = "1.21.0", features = ["full"] }
+csv = "1.1.6"
 
 [features]
 # by default Tauri runs in production mode

@@ -3380,6 +3380,7 @@ name = "text-analysis-gui"
 version = "0.0.0"
 dependencies = [
  "anyhow",
+ "csv",
  "futures",
  "itertools",
  "lindera",

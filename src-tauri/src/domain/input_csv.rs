@@ -13,7 +13,7 @@ impl TextWithYears {
                 .into_iter()
                 .map(|group| TextWithYear {
                     year: group.0,
-                    text: join_text(group.1),
+                    r#abstract: join_text(group.1),
                 })
                 .collect_vec(),
         )
@@ -21,7 +21,7 @@ impl TextWithYears {
 }
 
 fn join_text(array: Vec<TextWithYear>) -> String {
-    array.into_iter().map(|i| i.text).collect_vec().join("")
+    array.into_iter().map(|i| i.r#abstract).collect_vec().join("")
 }
 
 #[cfg(test)]
@@ -33,26 +33,26 @@ mod text_years_test {
         let expected = TextWithYears(vec![
             TextWithYear {
                 year: 2022,
-                text: "東京スカイツリー東京".into(),
+                r#abstract: "東京スカイツリー東京".into(),
             },
             TextWithYear {
                 year: 2021,
-                text: "スカイツリー".into(),
+                r#abstract: "スカイツリー".into(),
             },
         ]);
 
         let target = TextWithYears(vec![
             TextWithYear {
                 year: 2022,
-                text: "東京スカイツリー".into(),
+                r#abstract: "東京スカイツリー".into(),
             },
             TextWithYear {
                 year: 2022,
-                text: "東京".into(),
+                r#abstract: "東京".into(),
             },
             TextWithYear {
                 year: 2021,
-                text: "スカイツリー".into(),
+                r#abstract: "スカイツリー".into(),
             },
         ]);
 
@@ -66,11 +66,11 @@ mod text_years_test {
         let target = vec![
             TextWithYear {
                 year: 2022,
-                text: "東京スカイツリー".into(),
+                r#abstract: "東京スカイツリー".into(),
             },
             TextWithYear {
                 year: 2022,
-                text: "東京".into(),
+                r#abstract: "東京".into(),
             },
         ];
 
@@ -82,5 +82,5 @@ mod text_years_test {
 #[derive(Debug, Clone, Deserialize, PartialEq, Eq)]
 pub struct TextWithYear {
     pub year: usize,
-    pub text: String,
+    pub r#abstract: String,
 }
