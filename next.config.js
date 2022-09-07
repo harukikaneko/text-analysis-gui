@@ -8,6 +8,10 @@ const nextConfig = {
       unoptimized: true,
     },
   },
+  compiler: {
+    reactRemoveProperties: true,
+    emotion: true
+  }
 };
 
 module.exports = nextConfig;
