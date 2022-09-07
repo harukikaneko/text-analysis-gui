@@ -2,14 +2,14 @@ import { Dropdown, Link, Navbar } from "@nextui-org/react";
 import { icons } from "./atoms/Icon";
 
 export const TopNavbar: React.FC = () => (
-  <Navbar isCompact isBordered variant="floating">
+  <Navbar isCompact={true} isBordered={true} variant="floating">
     <Navbar.Content hideIn="xs" variant="underline">
       <Navbar.Link href="/">Home</Navbar.Link>
-      <Dropdown isBordered>
+      <Dropdown isBordered={true}>
         <Navbar.Item>
           <Dropdown.Button
-            auto
-            light
+            auto={true}
+            light={true}
             css={{
               px: 0,
               dflex: "center",
@@ -41,12 +41,11 @@ export const TopNavbar: React.FC = () => (
             },
           }}
         >
-          <Dropdown.Item
-            key="autoscaling"
-            showFullDescription
-            icon={icons.nouns}
-          >
-            <Link href="/analysis/nouns">Count by Noun</Link>
+          <Dropdown.Item key="simple" icon={icons.nouns}>
+            <Link href="/analysis/nouns">Simple Count</Link>
+          </Dropdown.Item>
+          <Dropdown.Item key="year" icon={icons.nouns}>
+            <Link href="/analysis/nouns/countsByYear">Counts By Year</Link>
           </Dropdown.Item>
         </Dropdown.Menu>
       </Dropdown>

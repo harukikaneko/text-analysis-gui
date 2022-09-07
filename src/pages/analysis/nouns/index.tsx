@@ -2,10 +2,10 @@ import { css } from "@emotion/react";
 import { Loading } from "@nextui-org/react";
 import { invoke } from "@tauri-apps/api/tauri";
 import { useState } from "react";
-import { Button } from "../../components/atoms/Button";
-import { TextInput } from "../../components/atoms/TextInput";
-import { CountsByNounTable } from "../../components/CountsByNounTable";
-import { CountsByNoun } from "../../types/noun";
+import { Button } from "../../../components/atoms/Button";
+import { TextInput } from "../../../components/atoms/TextInput";
+import { CountsByNounTable } from "../../../components/CountsByNounTable";
+import { CountsByNoun } from "../../../types/noun";
 import { NextPage } from "next";
 import { open } from "@tauri-apps/api/dialog";
 
@@ -83,7 +83,10 @@ const Nouns: NextPage = () => {
           />
           <Button text="Analysis" onClick={count_by_noun} />
           <Button text="Set Dictionary" onClick={selectDictionaryPath} />
-          <Button text="Set UserDictionary" onClick={selectUserDictionaryPath} />
+          <Button
+            text="Set UserDictionary"
+            onClick={selectUserDictionaryPath}
+          />
         </div>
       </div>
 
