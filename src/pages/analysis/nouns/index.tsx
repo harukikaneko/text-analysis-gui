@@ -22,8 +22,8 @@ const Nouns: NextPage = () => {
 
   const count_by_noun = async () => {
     setLoading(true);
-    await invoke("counts_by_noun", { text, dictionaryPath, userDictionaryPath })
-      .then((result: CountsByNoun[]) => {
+    await invoke<CountsByNoun[]>("counts_by_noun", { text, dictionaryPath, userDictionaryPath })
+      .then((result) => {
         setCountsByNoun(result.sort((a, b) => b.counts - a.counts));
         setLoading(false);
       })

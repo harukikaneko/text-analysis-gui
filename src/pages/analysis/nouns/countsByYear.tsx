@@ -21,12 +21,12 @@ const CountsByYear: NextPage = () => {
 
   const counts_of_nouns_by_year = async () => {
     setLoading(true);
-    await invoke("counts_of_nouns_by_year", {
+    await invoke<CountsOfNounByYear[]>("counts_of_nouns_by_year", {
       csvPath,
       dictionaryPath,
       userDictionaryPath,
     })
-      .then((result: CountsOfNounByYear[]) => {
+      .then((result) => {
         setItems(result);
         setLoading(false);
       })
