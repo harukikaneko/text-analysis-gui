@@ -6,7 +6,7 @@ use super::{Noun, Nouns};
 pub struct Tokens(pub Vec<Token>);
 
 impl Tokens {
-    pub fn exclude_non_nouns(self) -> Nouns {
+    pub fn exclude_non_unconditional(self) -> Nouns {
         Nouns(
             self.0
                 .into_iter()
@@ -16,6 +16,7 @@ impl Tokens {
                         && x.detail.not_number()
                         && x.detail.not_pronouns()
                         && x.detail.not_independent()
+                        && x.detail.not_adjectival_stem()
                 })
                 .map(|nouns| Noun(nouns.word.0))
                 .collect_vec(),
@@ -28,7 +29,7 @@ mod tokens_test {
     use super::*;
 
     #[test]
-    fn test_exclude_non_nouns() {
+    fn test_exclude_non_unconditional() {
         let token = Token {
             word: Word("東京スカイツリー".into()),
             detail: Detail(vec!["名詞".into()]),
@@ -39,7 +40,7 @@ mod tokens_test {
         };
         let tokens = Tokens(vec![token, exclude_token]);
         let expected = Nouns(vec![Noun("東京スカイツリー".into())]);
-        assert_eq!(tokens.exclude_non_nouns(), expected)
+        assert_eq!(tokens.exclude_non_unconditional(), expected)
     }
 }
 

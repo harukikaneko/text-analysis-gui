@@ -3,7 +3,7 @@ use itertools::Itertools;
 use lindera::LinderaResult;
 
 pub fn aggregate_group_by_noun(tokens: Tokens) -> LinderaResult<Vec<CountsByNoun>> {
-    let exclude_non_nouns = tokens.exclude_non_nouns();
+    let exclude_non_nouns = tokens.exclude_non_unconditional();
     Ok(exclude_non_nouns.aggregate_group_by_word())
 }
 
@@ -14,7 +14,7 @@ pub fn aggregate_counts_of_nouns_by_year(
         .into_iter()
         .map(|item| CountsOfNounsByYear {
             year: item.0,
-            nouns: item.1.exclude_non_nouns().aggregate_group_by_word(),
+            nouns: item.1.exclude_non_unconditional().aggregate_group_by_word(),
         })
         .collect_vec())
 }
