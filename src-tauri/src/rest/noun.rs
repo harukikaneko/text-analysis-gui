@@ -2,7 +2,7 @@ use std::fs;
 
 use tauri::command;
 
-use crate::domain::{CountsByNoun, CountsOfNounsByYear, TextWithYears, TextWithYear};
+use crate::domain::{CountsByNoun, CountsOfNounsByYear, TextWithYear, TextWithYears};
 use futures::future::try_join_all;
 use itertools::Itertools;
 
@@ -37,15 +37,20 @@ pub async fn counts_of_nouns_by_year(
         .0
         .into_iter()
         .map(|v| {
-            usecase::token::get_tokens_by_year(v.year, v.r#abstract, &dictionary_path, &user_dictionary)
+            usecase::token::get_tokens_by_year(
+                v.year,
+                v.r#abstract,
+                &dictionary_path,
+                &user_dictionary,
+            )
         })
         .collect_vec();
-    
+
     let aggregate_target = match try_join_all(handles).await {
         Ok(v) => v.into_iter().collect_vec(),
         Err(err) => return Err(format!("failed to tokens {}", err)),
     };
-    
+
     match usecase::noun::aggregate_counts_of_nouns_by_year(aggregate_target) {
         Ok(items) => Ok(items),
         Err(err) => Err(format!("failed to {}", err)),

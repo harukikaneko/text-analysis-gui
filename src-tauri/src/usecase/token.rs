@@ -3,7 +3,7 @@ use lindera::{tokenizer::Tokenizer, LinderaResult};
 
 use crate::{
     config::dictionary_setup,
-    domain::{Detail, Token, Tokens},
+    domain::{Detail, Token, Tokens, Word},
 };
 
 pub fn get_tokens(
@@ -17,10 +17,10 @@ pub fn get_tokens(
         .tokenize(&word)?
         .into_iter()
         .map(|token| Token {
-            text: token.text.to_string(),
+            word: Word(token.text.to_string()),
             detail: Detail(token.detail),
         })
-        .collect_vec(); // 元のstructを&str→Stringにしたい為
+        .collect_vec(); // 元のstructを&str→Stringにしたい為,domainを詰め直している
     Ok(Tokens(tokens))
 }
 
@@ -61,7 +61,7 @@ mod test {
         };
 
         let token = Token {
-            text: "東京".into(),
+            word: Word("東京".into()),
             detail: Detail(vec![
                 "名詞".into(),
                 "固有名詞".into(),
@@ -76,7 +76,7 @@ mod test {
         };
 
         let exclude_token = Token {
-            text: "の".into(),
+            word: Word("の".into()),
             detail: Detail(vec![
                 "助詞".into(),
                 "連体化".into(),
@@ -114,7 +114,7 @@ mod test {
         };
 
         let token = Token {
-            text: "東京".into(),
+            word: Word("東京".into()),
             detail: Detail(vec![
                 "名詞".into(),
                 "固有名詞".into(),
@@ -129,7 +129,7 @@ mod test {
         };
 
         let exclude_token = Token {
-            text: "の".into(),
+            word: Word("の".into()),
             detail: Detail(vec![
                 "助詞".into(),
                 "連体化".into(),

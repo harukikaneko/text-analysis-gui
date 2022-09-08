@@ -21,7 +21,11 @@ impl TextWithYears {
 }
 
 fn join_text(array: Vec<TextWithYear>) -> String {
-    array.into_iter().map(|i| i.r#abstract).collect_vec().join("")
+    array
+        .into_iter()
+        .map(|i| i.r#abstract)
+        .collect_vec()
+        .join("")
 }
 
 #[cfg(test)]
