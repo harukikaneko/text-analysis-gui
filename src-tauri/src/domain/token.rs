@@ -14,6 +14,7 @@ impl Tokens {
                     x.word.limit_word_length(2)
                         && x.detail.is_nouns()
                         && x.detail.not_number()
+                        && x.detail.not_pronouns()
                         && x.detail.not_independent()
                 })
                 .map(|nouns| Noun(nouns.word.0))
@@ -62,6 +63,10 @@ impl Detail {
 
     pub fn not_independent(&self) -> bool {
         !self.0.contains(&"非自立".to_string())
+    }
+
+    pub fn not_pronouns(&self) -> bool {
+        !self.0.contains(&"代名詞".to_string())
     }
 }
 
@@ -121,8 +126,50 @@ mod detail_test {
 
     #[test]
     fn test_is_not_independent() {
-        let detail = Detail(vec!["助詞".into()]);
+        let detail = Detail(vec![
+            "名詞".into(),
+            "代名詞".into(),
+            "一般".into(),
+            "*".into(),
+            "*".into(),
+            "*".into(),
+            "これら".into(),
+            "コレラ".into(),
+            "コレラ".into(),
+        ]);
         assert!(detail.not_independent())
+    }
+
+    #[test]
+    fn test_is_pronouns() {
+        let detail = Detail(vec![
+            "名詞".into(),
+            "代名詞".into(),
+            "一般".into(),
+            "*".into(),
+            "*".into(),
+            "*".into(),
+            "これら".into(),
+            "コレラ".into(),
+            "コレラ".into(),
+        ]);
+        assert!(!detail.not_pronouns())
+    }
+
+    #[test]
+    fn test_is_not_pronouns() {
+        let detail = Detail(vec![
+            "名詞".into(),
+            "非自立".into(),
+            "副詞可能".into(),
+            "*".into(),
+            "*".into(),
+            "*".into(),
+            "ため".into(),
+            "タメ".into(),
+            "タメ".into(),
+        ]);
+        assert!(detail.not_pronouns())
     }
 }
 
