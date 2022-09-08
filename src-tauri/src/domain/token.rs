@@ -2,7 +2,7 @@ use itertools::Itertools;
 
 use super::{Noun, Nouns};
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Tokens(pub Vec<Token>);
 
 impl Tokens {
@@ -42,13 +42,13 @@ mod tokens_test {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Token {
     pub word: Word,
     pub detail: Detail,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Detail(pub Vec<String>);
 
 impl Detail {
@@ -126,7 +126,7 @@ mod detail_test {
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Word(pub String);
 
 impl Word {
