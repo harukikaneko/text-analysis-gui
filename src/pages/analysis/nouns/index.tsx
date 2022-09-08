@@ -1,7 +1,7 @@
 import { css } from "@emotion/react";
 import { Loading } from "@nextui-org/react";
-import { invoke } from "@tauri-apps/api";
 import { open } from "@tauri-apps/api/dialog";
+import { invoke } from "@tauri-apps/api/tauri";
 import { NextPage } from "next";
 import { useState } from "react";
 import { Button } from "../../../components/atoms/Button";
