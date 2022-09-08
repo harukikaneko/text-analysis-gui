@@ -68,6 +68,10 @@ impl Detail {
     pub fn not_pronouns(&self) -> bool {
         !self.0.contains(&"代名詞".to_string())
     }
+
+    pub fn not_adjectival_stem(&self) -> bool {
+        !self.0.contains(&"形容動詞語幹".to_string())
+    }
 }
 
 #[cfg(test)]
@@ -126,17 +130,7 @@ mod detail_test {
 
     #[test]
     fn test_is_not_independent() {
-        let detail = Detail(vec![
-            "名詞".into(),
-            "代名詞".into(),
-            "一般".into(),
-            "*".into(),
-            "*".into(),
-            "*".into(),
-            "これら".into(),
-            "コレラ".into(),
-            "コレラ".into(),
-        ]);
+        let detail = Detail(vec!["名詞".into(), "代名詞".into(), "一般".into()]);
         assert!(detail.not_independent())
     }
 
@@ -158,18 +152,30 @@ mod detail_test {
 
     #[test]
     fn test_is_not_pronouns() {
+        let detail = Detail(vec!["名詞".into(), "非自立".into(), "副詞可能".into()]);
+        assert!(detail.not_pronouns())
+    }
+
+    #[test]
+    fn test_is_adjectival_stem() {
         let detail = Detail(vec![
             "名詞".into(),
-            "非自立".into(),
-            "副詞可能".into(),
+            "形容動詞語幹".into(),
             "*".into(),
             "*".into(),
             "*".into(),
-            "ため".into(),
-            "タメ".into(),
-            "タメ".into(),
+            "*".into(),
+            "明らか".into(),
+            "アキラカ".into(),
+            "アキラカ".into(),
         ]);
-        assert!(detail.not_pronouns())
+        assert!(!detail.not_adjectival_stem())
+    }
+
+    #[test]
+    fn test_is_not_adjectival_stem() {
+        let detail = Detail(vec!["名詞".into(), "非自立".into(), "副詞可能".into()]);
+        assert!(detail.not_adjectival_stem())
     }
 }
 
