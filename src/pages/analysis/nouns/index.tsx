@@ -86,8 +86,8 @@ const CountsByYear: NextPage = () => {
               display: flex;
             `}
           >
-            <Button text="Analysis" onClick={counts_of_nouns_by_year} />
             <Button text="Set Csv" onClick={selectCsvPath} />
+            <Button text="Analysis" onClick={counts_of_nouns_by_year} />
             <Button text="Set Dictionary" onClick={selectDictionaryPath} />
             <Button
               text="Set UserDictionary"
