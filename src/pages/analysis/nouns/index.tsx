@@ -1,17 +1,16 @@
 import { css } from "@emotion/react";
 import { Loading } from "@nextui-org/react";
-import { invoke } from "@tauri-apps/api/tauri";
+import { invoke } from "@tauri-apps/api";
+import { open } from "@tauri-apps/api/dialog";
+import { NextPage } from "next";
 import { useState } from "react";
 import { Button } from "../../../components/atoms/Button";
-import { TextInput } from "../../../components/atoms/TextInput";
 import { CountsByNounTable } from "../../../components/CountsByNounTable";
-import { CountsByNoun } from "../../../types/noun";
-import { NextPage } from "next";
-import { open } from "@tauri-apps/api/dialog";
+import { CountsOfNounByYear } from "../../../types/noun";
 
-const Nouns: NextPage = () => {
-  const [countsByNoun, setCountsByNoun] = useState<CountsByNoun[]>([]);
-  const [text, setText] = useState("");
+const CountsByYear: NextPage = () => {
+  const [items, setItems] = useState<CountsOfNounByYear[]>([]);
+  const [csvPath, setCsvPath] = useState<string | string[] | null>("");
   const [isLoading, setLoading] = useState(false);
   const [dictionaryPath, setDictionaryPath] = useState<
     string | string[] | null
@@ -20,21 +19,28 @@ const Nouns: NextPage = () => {
     string | string[] | null
   >(null);
 
-  const count_by_noun = async () => {
+  const counts_of_nouns_by_year = async () => {
     setLoading(true);
-    await invoke<CountsByNoun[]>("counts_by_noun", {
-      text,
+    await invoke<CountsOfNounByYear[]>("counts_of_nouns_by_year", {
+      csvPath,
       dictionaryPath,
       userDictionaryPath,
     })
       .then((result) => {
-        setCountsByNoun(result.sort((a, b) => b.counts - a.counts));
+        setItems(result);
         setLoading(false);
       })
       .catch((err) => {
-        console.error("counts_by_noun", err);
+        console.error("counts_of_nouns_by_year", err);
         setLoading(false);
       });
+  };
+
+  const selectCsvPath = async () => {
+    const path = await open({
+      filters: [{ name: "Csv", extensions: ["csv"] }],
+    });
+    setCsvPath(path);
   };
 
   const selectDictionaryPath = async () => {
@@ -50,54 +56,71 @@ const Nouns: NextPage = () => {
   };
 
   return (
-    <div
-      css={css`
-        margin: 0;
-        padding-top: 10vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        text-align: center;
-      `}
-    >
-      <h1
+    <>
+      <div
         css={css`
+          margin: 0;
+          padding-top: 10vh;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
           text-align: center;
         `}
       >
-        Lets Counts by Noun
-      </h1>
+        <h1
+          css={css`
+            text-align: center;
+          `}
+        >
+          Lets Counts of Noun by Year
+        </h1>
 
-      <div
-        css={css`
-          display: flex;
-          justify-content: center;
-        `}
-      >
         <div
           css={css`
             display: flex;
+            justify-content: center;
           `}
         >
-          <TextInput
-            placeholder="Enter a text..."
-            handleOnChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setText(e.currentTarget.value)
-            }
-          />
-          <Button text="Analysis" onClick={count_by_noun} />
-          <Button text="Set Dictionary" onClick={selectDictionaryPath} />
-          <Button
-            text="Set UserDictionary"
-            onClick={selectUserDictionaryPath}
-          />
+          <div
+            css={css`
+              display: flex;
+            `}
+          >
+            <Button text="Analysis" onClick={counts_of_nouns_by_year} />
+            <Button text="Set Csv" onClick={selectCsvPath} />
+            <Button text="Set Dictionary" onClick={selectDictionaryPath} />
+            <Button
+              text="Set UserDictionary"
+              onClick={selectUserDictionaryPath}
+            />
+          </div>
+        </div>
+
+        {isLoading && <Loading />}
+        <div
+          css={css`
+            display: flex;
+            justify-content: space-evenly;
+          `}
+        >
+          {items
+            .sort((a, b) => a.year - b.year)
+            .map((item, index) => (
+              <>
+                <div key={index}>
+                  <p>{item.year}</p>
+                  <CountsByNounTable
+                    countsByNoun={item.nouns.sort(
+                      (a, b) => b.counts - a.counts
+                    )}
+                  />
+                </div>
+              </>
+            ))}
         </div>
       </div>
-
-      {isLoading && <Loading />}
-      <CountsByNounTable countsByNoun={countsByNoun} />
-    </div>
+    </>
   );
 };
 
-export default Nouns;
+export default CountsByYear;

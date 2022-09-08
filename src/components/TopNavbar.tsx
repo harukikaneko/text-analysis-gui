@@ -41,11 +41,8 @@ export const TopNavbar: React.FC = () => (
             },
           }}
         >
-          <Dropdown.Item key="simple" icon={icons.nouns}>
-            <Link href="/analysis/nouns">Simple Count</Link>
-          </Dropdown.Item>
           <Dropdown.Item key="year" icon={icons.nouns}>
-            <Link href="/analysis/nouns/countsByYear">Counts By Year</Link>
+            <Link href="/analysis/nouns">Counts By Year</Link>
           </Dropdown.Item>
         </Dropdown.Menu>
       </Dropdown>
