@@ -17,6 +17,7 @@ impl Tokens {
                         && x.detail.not_pronouns()
                         && x.detail.not_independent()
                         && x.detail.not_adjectival_stem()
+                        && x.detail.not_adverbable()
                 })
                 .map(|nouns| Noun(nouns.word.0))
                 .collect_vec(),
@@ -72,6 +73,10 @@ impl Detail {
 
     pub fn not_adjectival_stem(&self) -> bool {
         !self.0.contains(&"形容動詞語幹".to_string())
+    }
+
+    pub fn not_adverbable(&self) -> bool {
+        !self.0.contains(&"副詞可能".to_string())
     }
 }
 
@@ -177,6 +182,24 @@ mod detail_test {
     fn test_is_not_adjectival_stem() {
         let detail = Detail(vec!["名詞".into(), "非自立".into(), "副詞可能".into()]);
         assert!(detail.not_adjectival_stem())
+    }
+
+    #[test]
+    fn test_is_adverbable() {
+        let detail = Detail(vec![
+            "名詞".into(),
+            "副詞可能".into(),
+            "すべて".into(),
+            "スベテ".into(),
+            "スベテ".into(),
+        ]);
+        assert!(!detail.not_adverbable())
+    }
+
+    #[test]
+    fn test_is_not_adverbable() {
+        let detail = Detail(vec!["名詞".into(), "非自立".into()]);
+        assert!(detail.not_adverbable())
     }
 }
 
