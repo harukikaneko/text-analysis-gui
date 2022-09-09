@@ -1,13 +1,21 @@
 import { css } from "@emotion/react";
-import { Loading } from "@nextui-org/react";
+import {
+  Button,
+  Card,
+  Grid,
+  Input,
+  Loading,
+  Row,
+  Spacer,
+} from "@nextui-org/react";
 import { invoke } from "@tauri-apps/api/tauri";
 import { useState } from "react";
-import { Button } from "../components/atoms/Button";
-import { TextInput } from "../components/atoms/TextInput";
 import { CountsByNounTable } from "../components/CountsByNounTable";
 import { CountsByNoun } from "../types/noun";
 import { NextPage } from "next";
 import { open } from "@tauri-apps/api/dialog";
+import { PathInput } from "../components/PathInput";
+import { icons } from "../components/atoms/Icon";
 
 const Nouns: NextPage = () => {
   const [countsByNoun, setCountsByNoun] = useState<CountsByNoun[]>([]);
@@ -52,47 +60,46 @@ const Nouns: NextPage = () => {
   return (
     <div
       css={css`
-        margin: 0;
-        padding-top: 10vh;
-        display: flex;
-        flex-direction: column;
         justify-content: center;
         text-align: center;
       `}
     >
-      <h1
-        css={css`
-          text-align: center;
-        `}
-      >
-        Lets Counts by Noun
-      </h1>
-
-      <div
-        css={css`
-          display: flex;
-          justify-content: center;
-        `}
-      >
-        <div
-          css={css`
-            display: flex;
-          `}
-        >
-          <TextInput
-            placeholder="Enter a text..."
-            handleOnChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setText(e.currentTarget.value)
-            }
-          />
-          <Button text="Analysis" onClick={count_by_noun} />
-          <Button text="Set Dictionary" onClick={selectDictionaryPath} />
-          <Button
-            text="Set UserDictionary"
-            onClick={selectUserDictionaryPath}
-          />
-        </div>
-      </div>
+      <Grid>
+        <Card>
+          <Card.Body>
+            <Input
+              clearable
+              bordered
+              labelPlaceholder="input text"
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setText(e.currentTarget.value)
+              }
+            />
+            <Spacer y={1} />
+            <PathInput
+              text={dictionaryPath as string}
+              onClick={selectDictionaryPath}
+            >
+              {icons.file}
+            </PathInput>
+            <Spacer y={1} />
+            <PathInput
+              text={userDictionaryPath as string}
+              onClick={selectUserDictionaryPath}
+            >
+              {icons.file}
+            </PathInput>
+          </Card.Body>
+          <Card.Divider />
+          <Card.Footer>
+            <Row justify="flex-end">
+              <Button size="sm" color="secondary" onClick={count_by_noun}>
+                Analysis
+              </Button>
+            </Row>
+          </Card.Footer>
+        </Card>
+      </Grid>
 
       {isLoading && <Loading />}
       <CountsByNounTable countsByNoun={countsByNoun} />
