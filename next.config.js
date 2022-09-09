@@ -3,11 +3,8 @@
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
-  experimental: {
-    images: {
-      unoptimized: true,
-      allowFutureImage: true,
-    },
+  images: {
+    unoptimized: true
   },
   compiler: {
     reactRemoveProperties: true,
