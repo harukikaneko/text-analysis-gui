@@ -7,6 +7,9 @@ use lindera::{
         UserDictionaryConfig,
     },
 };
+use once_cell::sync::{Lazy, OnceCell};
+use serde::Deserialize;
+use sqlx::{postgres::PgPoolOptions, PgPool};
 
 #[mry::mry]
 pub fn dictionary_setup(
@@ -39,4 +42,34 @@ pub fn dictionary_setup(
     }
 
     config
+}
+
+pub async fn create_pool() -> PgPool {
+    let ip_db_url = &format!(
+        "postgres://{}:{}@{}:{}",
+        SETTINGS.db_user, SETTINGS.db_password, SETTINGS.db_host, SETTINGS.db_port,
+    );
+
+    PgPoolOptions::new()
+        .max_connections(5)
+        .connect(ip_db_url)
+        .await
+        .unwrap()
+}
+
+pub static SETTINGS: Lazy<Settings> = Lazy::new(|| Settings::new().unwrap());
+pub static DB_POOL: OnceCell<PgPool> = OnceCell::new();
+
+#[derive(Debug, Deserialize, Clone)]
+pub struct Settings {
+    pub db_host: String,
+    pub db_port: String,
+    pub db_user: String,
+    pub db_password: String,
+}
+
+impl Settings {
+    fn new() -> anyhow::Result<Self> {
+        Ok(envy::from_env::<Settings>()?)
+    }
 }

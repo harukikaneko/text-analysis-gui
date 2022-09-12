@@ -1,8 +1,9 @@
-use std::fs;
-
 use tauri::command;
 
-use crate::domain::{CountsByNoun, CountsOfNounsByYear, TextWithYear, TextWithYears};
+use crate::{
+    config::{create_pool, DB_POOL},
+    domain::{CountsByNoun, CountsOfNounsByYear},
+};
 use futures::future::try_join_all;
 use itertools::Itertools;
 
@@ -30,7 +31,10 @@ pub async fn counts_of_nouns_by_year(
     dictionary_path: Option<String>,
     user_dictionary: Option<String>,
 ) -> Result<Vec<CountsOfNounsByYear>, String> {
-    let csv_list = TextWithYears(read_csv(csv_path).unwrap());
+    let csv_list = match usecase::csv::read_csv(csv_path).await {
+        Ok(csv) => csv,
+        Err(err) => return Err(format!("Failed csv {}", err)),
+    };
 
     let handles = csv_list
         .group_by_year()
@@ -57,15 +61,41 @@ pub async fn counts_of_nouns_by_year(
     }
 }
 
-fn read_csv(file_path: String) -> anyhow::Result<Vec<TextWithYear>> {
-    let mut csv_list = Vec::new();
+#[command]
+pub async fn create_of_nouns_by_year(
+    csv_path: String,
+    dictionary_path: Option<String>,
+    user_dictionary: Option<String>,
+) -> Result<(), String> {
+    let ip_db_pool = create_pool().await;
+    DB_POOL.set(ip_db_pool).unwrap();
 
-    let csv_text = fs::read_to_string(file_path)?;
-    let mut rdr = csv::Reader::from_reader(csv_text.as_bytes());
-    for result in rdr.records() {
-        let record = result?.deserialize(None)?;
-        csv_list.push(record);
+    let csv_list = match usecase::csv::read_csv(csv_path).await {
+        Ok(csv) => csv,
+        Err(err) => return Err(format!("Failed csv {}", err)),
+    };
+
+    let handles = csv_list
+        .group_by_year()
+        .0
+        .into_iter()
+        .map(|v| {
+            usecase::token::get_tokens_by_year(
+                v.year,
+                v.r#abstract,
+                &dictionary_path,
+                &user_dictionary,
+            )
+        })
+        .collect_vec();
+
+    let create_target = match try_join_all(handles).await {
+        Ok(v) => v.into_iter().collect_vec(),
+        Err(err) => return Err(format!("failed to tokens {}", err)),
+    };
+
+    match usecase::noun::create_of_nouns_by_year(create_target).await {
+        Ok(_) => Ok(()),
+        Err(err) => Err(format!("failed to {}", err)),
     }
-
-    Ok(csv_list)
 }

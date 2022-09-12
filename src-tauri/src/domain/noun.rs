@@ -53,3 +53,9 @@ pub struct CountsOfNounsByYear {
     pub year: usize,
     pub nouns: Vec<CountsByNoun>,
 }
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct NounsByYear {
+    pub year: usize,
+    pub nouns: Nouns,
+}

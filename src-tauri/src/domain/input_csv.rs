@@ -4,6 +4,12 @@ use serde::Deserialize;
 #[derive(Debug, Clone, Deserialize, PartialEq, Eq)]
 pub struct TextWithYears(pub Vec<TextWithYear>);
 
+impl From<Vec<TextWithYear>> for TextWithYears {
+    fn from(from: Vec<TextWithYear>) -> TextWithYears {
+        TextWithYears(from)
+    }
+}
+
 impl TextWithYears {
     pub fn group_by_year(self) -> Self {
         Self(
@@ -34,16 +40,10 @@ mod text_years_test {
 
     #[test]
     fn test_group_by_year() {
-        let expected = TextWithYears(vec![
-            TextWithYear {
-                year: 2022,
-                r#abstract: "東京スカイツリー東京".into(),
-            },
-            TextWithYear {
-                year: 2021,
-                r#abstract: "スカイツリー".into(),
-            },
-        ]);
+        let expected = TextWithYears(vec![TextWithYear {
+            year: 2022,
+            r#abstract: "東京スカイツリー東京".into(),
+        }]);
 
         let target = TextWithYears(vec![
             TextWithYear {
@@ -53,10 +53,6 @@ mod text_years_test {
             TextWithYear {
                 year: 2022,
                 r#abstract: "東京".into(),
-            },
-            TextWithYear {
-                year: 2021,
-                r#abstract: "スカイツリー".into(),
             },
         ]);
 
