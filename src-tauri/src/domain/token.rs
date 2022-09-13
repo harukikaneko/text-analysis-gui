@@ -2,7 +2,7 @@ use itertools::Itertools;
 
 use super::{CountsOfNounsByYear, Noun, Nouns, NounsByYear};
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct TokensWithYear(Vec<(usize, Tokens)>);
 
 impl From<Vec<(usize, Tokens)>> for TokensWithYear {
