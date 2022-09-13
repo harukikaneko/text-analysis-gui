@@ -5,7 +5,7 @@ use serde::Deserialize;
 pub struct TextWithYears(pub Vec<TextWithYear>);
 
 impl From<Vec<TextWithYear>> for TextWithYears {
-    fn from(from: Vec<TextWithYear>) -> TextWithYears {
+    fn from(from: Vec<TextWithYear>) -> Self {
         TextWithYears(from)
     }
 }

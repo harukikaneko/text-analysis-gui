@@ -1,12 +1,140 @@
 use itertools::Itertools;
 
-use super::{Noun, Nouns};
+use super::{CountsOfNounsByYear, Noun, Nouns, NounsByYear};
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct TokensWithYear(Vec<(usize, Tokens)>);
+
+impl From<Vec<(usize, Tokens)>> for TokensWithYear {
+    fn from(from: Vec<(usize, Tokens)>) -> Self {
+        TokensWithYear(from)
+    }
+}
+
+impl TokensWithYear {
+    pub fn aggregate_exclude_outside_condition_by_year(self) -> Vec<CountsOfNounsByYear> {
+        self.0
+            .into_iter()
+            .map(|item| CountsOfNounsByYear {
+                year: item.0,
+                nouns: item.1.exclude_outside_condition().aggregate_group_by_word(),
+            })
+            .collect_vec()
+    }
+
+    pub fn exclude_outside_condition_by_year(self) -> Vec<NounsByYear> {
+        self.0
+            .into_iter()
+            .map(|item| NounsByYear {
+                year: item.0,
+                nouns: item.1.exclude_outside_condition(),
+            })
+            .collect_vec()
+    }
+}
+
+#[cfg(test)]
+mod tokens_with_year_test {
+    use crate::domain::CountsByNoun;
+
+    use super::*;
+
+    #[test]
+    fn test_from() {
+        let token = Token {
+            word: Word("東京スカイツリー".into()),
+            detail: Detail(vec!["名詞".into()]),
+        };
+
+        let exclude_token = Token {
+            word: Word("の".into()),
+            detail: Detail(vec!["助詞".into()]),
+        };
+
+        let target = vec![
+            (2022, Tokens(vec![token.clone(), exclude_token.clone()])),
+            (2021, Tokens(vec![token, exclude_token])),
+        ];
+
+        let actual: TokensWithYear = target.clone().into();
+        assert_eq!(actual, TokensWithYear(target))
+    }
+
+    #[test]
+    fn test_aggregate_exclude_outside_condition_by_year() {
+        let token = Token {
+            word: Word("東京スカイツリー".into()),
+            detail: Detail(vec!["名詞".into()]),
+        };
+
+        let exclude_token = Token {
+            word: Word("の".into()),
+            detail: Detail(vec!["助詞".into()]),
+        };
+
+        let target = TokensWithYear(vec![
+            (2022, Tokens(vec![token.clone(), exclude_token.clone()])),
+            (2021, Tokens(vec![token, exclude_token])),
+        ]);
+
+        let expected = vec![
+            CountsOfNounsByYear {
+                year: 2022,
+                nouns: vec![CountsByNoun {
+                    noun: Noun("東京スカイツリー".into()),
+                    counts: 1,
+                }],
+            },
+            CountsOfNounsByYear {
+                year: 2021,
+                nouns: vec![CountsByNoun {
+                    noun: Noun("東京スカイツリー".into()),
+                    counts: 1,
+                }],
+            },
+        ];
+        assert_eq!(
+            target.aggregate_exclude_outside_condition_by_year(),
+            expected
+        )
+    }
+
+    #[test]
+    fn exclude_outside_condition_by_year() {
+        let token = Token {
+            word: Word("東京スカイツリー".into()),
+            detail: Detail(vec!["名詞".into()]),
+        };
+
+        let exclude_token = Token {
+            word: Word("の".into()),
+            detail: Detail(vec!["助詞".into()]),
+        };
+
+        let target = TokensWithYear(vec![
+            (2022, Tokens(vec![token.clone(), exclude_token.clone()])),
+            (2021, Tokens(vec![token, exclude_token])),
+        ]);
+
+        let expected = vec![
+            NounsByYear {
+                year: 2022,
+                nouns: Nouns(vec![Noun("東京スカイツリー".into())]),
+            },
+            NounsByYear {
+                year: 2021,
+                nouns: Nouns(vec![Noun("東京スカイツリー".into())]),
+            },
+        ];
+        assert_eq!(target.exclude_outside_condition_by_year(), expected)
+    }
+}
 
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Tokens(pub Vec<Token>);
 
 impl Tokens {
-    pub fn exclude_non_unconditional(self) -> Nouns {
+    pub fn exclude_outside_condition(self) -> Nouns {
         Nouns(
             self.0
                 .into_iter()
@@ -41,7 +169,7 @@ mod tokens_test {
         };
         let tokens = Tokens(vec![token, exclude_token]);
         let expected = Nouns(vec![Noun("東京スカイツリー".into())]);
-        assert_eq!(tokens.exclude_non_unconditional(), expected)
+        assert_eq!(tokens.exclude_outside_condition(), expected)
     }
 }
 
