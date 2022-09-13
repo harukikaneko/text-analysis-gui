@@ -46,6 +46,7 @@ export const TopNavbar: React.FC = () => (
           </Dropdown.Item>
         </Dropdown.Menu>
       </Dropdown>
+      <Navbar.Link href="/create/nouns">DB</Navbar.Link>
     </Navbar.Content>
   </Navbar>
 );
