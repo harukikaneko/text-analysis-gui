@@ -32,7 +32,7 @@ pub async fn create_of_nouns_by_year(target: Vec<(usize, Tokens)>) -> anyhow::Re
             nouns: item.1.exclude_non_unconditional(),
         })
         .collect_vec();
-    Ok(gateway::noun::register_nouns_by_year(create_target).await?)
+    gateway::noun::register_nouns_by_year(create_target).await
 }
 
 #[cfg(test)]
