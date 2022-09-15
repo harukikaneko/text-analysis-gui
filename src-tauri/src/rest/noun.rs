@@ -51,7 +51,7 @@ pub async fn counts_of_nouns_by_year(
         .collect_vec();
 
     let aggregate_target = match try_join_all(handles).await {
-        Ok(v) => v.into_iter().collect_vec(),
+        Ok(v) => v,
         Err(err) => return Err(format!("failed to tokens {}", err)),
     };
 
