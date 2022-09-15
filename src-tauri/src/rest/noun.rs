@@ -93,7 +93,7 @@ async fn get_tokens_by_year_handles_join(
         })
         .collect_vec();
 
-    Ok(try_join_all(handles).await?)
+    try_join_all(handles).await
 }
 
 #[cfg(test)]
