@@ -24,6 +24,7 @@ pub fn get_tokens(
     Ok(Tokens(tokens))
 }
 
+#[mry::mry]
 pub async fn get_tokens_by_year(
     year: usize,
     word: String,

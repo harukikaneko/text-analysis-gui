@@ -2,7 +2,7 @@ use tauri::command;
 
 use crate::{
     config::{create_pool, DB_POOL},
-    domain::{CountsByNoun, CountsOfNounsByYear},
+    domain::{CountsByNoun, CountsOfNounsByYear, TextWithYears, Tokens},
 };
 use futures::future::try_join_all;
 use itertools::Itertools;
@@ -36,24 +36,11 @@ pub async fn counts_of_nouns_by_year(
         Err(err) => return Err(format!("Failed csv {}", err)),
     };
 
-    let handles = csv_list
-        .group_by_year()
-        .0
-        .into_iter()
-        .map(|v| {
-            usecase::token::get_tokens_by_year(
-                v.year,
-                v.r#abstract,
-                &dictionary_path,
-                &user_dictionary,
-            )
-        })
-        .collect_vec();
-
-    let aggregate_target = match try_join_all(handles).await {
-        Ok(v) => v,
-        Err(err) => return Err(format!("failed to tokens {}", err)),
-    };
+    let aggregate_target =
+        match get_tokens_by_year_handles_join(csv_list, dictionary_path, user_dictionary).await {
+            Ok(v) => v,
+            Err(err) => return Err(format!("failed to tokens {}", err)),
+        };
 
     match usecase::noun::aggregate_counts_of_nouns_by_year(aggregate_target) {
         Ok(items) => Ok(items),
@@ -75,6 +62,23 @@ pub async fn create_of_nouns_by_year(
         Err(err) => return Err(format!("Failed csv {}", err)),
     };
 
+    let create_target =
+        match get_tokens_by_year_handles_join(csv_list, dictionary_path, user_dictionary).await {
+            Ok(v) => v,
+            Err(err) => return Err(format!("failed to tokens {}", err)),
+        };
+
+    match usecase::noun::create_of_nouns_by_year(create_target).await {
+        Ok(_) => Ok(()),
+        Err(err) => Err(format!("failed to {}", err)),
+    }
+}
+
+async fn get_tokens_by_year_handles_join(
+    csv_list: TextWithYears,
+    dictionary_path: Option<String>,
+    user_dictionary: Option<String>,
+) -> anyhow::Result<Vec<(usize, Tokens)>> {
     let handles = csv_list
         .group_by_year()
         .0
@@ -89,13 +93,45 @@ pub async fn create_of_nouns_by_year(
         })
         .collect_vec();
 
-    let create_target = match try_join_all(handles).await {
-        Ok(v) => v.into_iter().collect_vec(),
-        Err(err) => return Err(format!("failed to tokens {}", err)),
+    Ok(try_join_all(handles).await?)
+}
+
+#[cfg(test)]
+mod test {
+    use crate::{
+        domain::TextWithYear,
+        usecase::token::{get_tokens_by_year, mock_get_tokens_by_year},
     };
 
-    match usecase::noun::create_of_nouns_by_year(create_target).await {
-        Ok(_) => Ok(()),
-        Err(err) => Err(format!("failed to {}", err)),
+    use super::*;
+
+    #[tokio::test]
+    #[mry::lock(get_tokens_by_year)]
+    async fn test_get_tokens_by_year_handles_join() {
+        let expected = vec![(2022, Tokens(vec![])), (2021, Tokens(vec![]))];
+
+        let csv_list = TextWithYears(vec![
+            TextWithYear {
+                year: 2022,
+                r#abstract: "".into(),
+            },
+            TextWithYear {
+                year: 2021,
+                r#abstract: "".into(),
+            },
+        ]);
+        let dictionary_path = Some("".into());
+        let user_dictionary = Some("".into());
+
+        mock_get_tokens_by_year(2021, "", dictionary_path.clone(), user_dictionary.clone())
+            .returns_with(move |_, _, _, _| Ok((2021, Tokens(vec![]))));
+        mock_get_tokens_by_year(2022, "", dictionary_path.clone(), user_dictionary.clone())
+            .returns_with(move |_, _, _, _| Ok((2022, Tokens(vec![]))));
+
+        let actual = get_tokens_by_year_handles_join(csv_list, dictionary_path, user_dictionary)
+            .await
+            .unwrap();
+
+        assert_eq!(actual, expected)
     }
 }
