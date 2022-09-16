@@ -6,7 +6,7 @@ use crate::config::SETTINGS;
 
 #[mry::mry]
 pub async fn translate_to_ja(query: &Vec<(String, String)>) -> anyhow::Result<TranslatedTextList> {
-    let url = format!("https://api-free.deepl.com/v2/translate");
+    let url = "https://api-free.deepl.com/v2/translate".to_string();
     let client = reqwest::Client::new();
 
     let payload = query.clone();
@@ -49,7 +49,7 @@ pub struct TranslatedTextList {
     pub translations: Vec<TranslatedText>,
 }
 
-#[derive(Debug, Clone, Deserialize, PartialEq)]
+#[derive(Debug, Clone, Deserialize, PartialEq, Eq)]
 pub struct TranslatedText {
     pub detected_source_language: String,
     pub text: String,
