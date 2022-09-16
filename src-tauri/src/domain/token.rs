@@ -139,7 +139,8 @@ impl Tokens {
             self.0
                 .into_iter()
                 .filter(|x| {
-                    x.word.limit_word_length(2)
+                    x.word.not_ascii_alphabet()
+                        && x.word.limit_word_length(2)
                         && x.detail.is_nouns()
                         && x.detail.not_number()
                         && x.detail.not_pronouns()
@@ -338,6 +339,10 @@ impl Word {
     pub fn limit_word_length(&self, limit: usize) -> bool {
         self.0.chars().count() > limit
     }
+
+    pub fn not_ascii_alphabet(&self) -> bool {
+        !self.0.is_ascii()
+    }
 }
 
 #[cfg(test)]
@@ -354,5 +359,17 @@ mod word_test {
     fn test_limit_word_length_2_lt() {
         let target = Word("東京".into());
         assert!(!target.limit_word_length(2))
+    }
+
+    #[test]
+    fn test_not_ascii_alphabet() {
+        let target = Word("東京".into());
+        assert!(target.not_ascii_alphabet())
+    }
+
+    #[test]
+    fn test_is_ascii_alphabet() {
+        let target = Word("The".into());
+        assert!(!target.not_ascii_alphabet())
     }
 }
