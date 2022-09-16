@@ -3,6 +3,7 @@
     windows_subsystem = "windows"
 )]
 
+use config::{DB_POOL, create_pool};
 use tauri::{generate_context, generate_handler, Builder};
 
 mod config;
@@ -12,7 +13,11 @@ mod gateway;
 mod rest;
 mod usecase;
 
-fn main() {
+#[tokio::main]
+async fn main() {
+    let ip_db_pool = create_pool().await;
+    DB_POOL.set(ip_db_pool).unwrap();
+    
     Builder::default()
         .invoke_handler(generate_handler![
             rest::noun::counts_by_noun,

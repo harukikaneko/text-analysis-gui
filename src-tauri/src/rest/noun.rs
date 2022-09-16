@@ -1,7 +1,6 @@
 use tauri::command;
 
 use crate::{
-    config::{create_pool, DB_POOL},
     domain::{CountsByNoun, CountsOfNounsByYear, TextWithYears, Tokens},
 };
 use futures::future::try_join_all;
@@ -54,9 +53,6 @@ pub async fn create_of_nouns_by_year(
     dictionary_path: Option<String>,
     user_dictionary: Option<String>,
 ) -> Result<(), String> {
-    let ip_db_pool = create_pool().await;
-    DB_POOL.set(ip_db_pool).unwrap();
-
     let csv_list = match usecase::csv::read_csv(csv_path).await {
         Ok(csv) => csv,
         Err(err) => return Err(format!("Failed csv {}", err)),
