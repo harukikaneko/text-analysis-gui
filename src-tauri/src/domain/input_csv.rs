@@ -46,9 +46,7 @@ impl TextWithYears {
     pub fn push_items(mut self, items: TextWithYears) -> Self {
         items.0.into_iter().for_each(|item| {
             self.0.push(item);
-            println!("{:?}", self);
         });
-        println!("{:?}", self);
         self
     }
 

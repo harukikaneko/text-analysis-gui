@@ -61,8 +61,6 @@ pub async fn create_of_nouns_by_year(
         Err(err) => return Err(format!("Failed translate {}", err)),
     };
 
-    println!("{:?}", translated_csv);
-
     let create_target =
         match get_tokens_by_year_handles_join(translated_csv, dictionary_path, user_dictionary)
             .await
