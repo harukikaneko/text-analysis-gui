@@ -13,6 +13,7 @@ pub fn get_tokens(
 ) -> LinderaResult<Tokens> {
     let config = dictionary_setup(dictionary_path, user_dictionary);
     let tokenizer = Tokenizer::with_config(config)?;
+
     let tokens = tokenizer
         .tokenize(&word)?
         .into_iter()

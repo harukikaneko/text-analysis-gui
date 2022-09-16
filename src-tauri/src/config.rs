@@ -66,6 +66,7 @@ pub struct Settings {
     pub db_port: String,
     pub db_user: String,
     pub db_password: String,
+    pub deepl_token: String,
 }
 
 impl Settings {

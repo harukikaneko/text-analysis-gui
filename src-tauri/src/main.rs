@@ -3,7 +3,7 @@
     windows_subsystem = "windows"
 )]
 
-use config::{DB_POOL, create_pool};
+use config::{create_pool, DB_POOL};
 use tauri::{generate_context, generate_handler, Builder};
 
 mod config;
@@ -17,7 +17,7 @@ mod usecase;
 async fn main() {
     let ip_db_pool = create_pool().await;
     DB_POOL.set(ip_db_pool).unwrap();
-    
+
     Builder::default()
         .invoke_handler(generate_handler![
             rest::noun::counts_by_noun,
