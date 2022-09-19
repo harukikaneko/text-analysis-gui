@@ -22,13 +22,17 @@ pub async fn translate_to_ja(query: &Vec<(String, String)>) -> anyhow::Result<Tr
         .await
     {
         Ok(response) if response.status().is_success() => response,
-        Ok(response) if response.status() == reqwest::StatusCode::UNAUTHORIZED => {
-            bail!(ErrorKind::AuthorizationError)
-        }
-        Ok(response) if response.status() == reqwest::StatusCode::FORBIDDEN => {
-            bail!(ErrorKind::AuthorizationError)
-        }
-
+        Ok(response) if response.status().is_client_error() => match response.status() {
+            reqwest::StatusCode::UNAUTHORIZED => {
+                bail!(ErrorKind::AuthorizationError)
+            }
+            reqwest::StatusCode::FORBIDDEN => {
+                bail!(ErrorKind::AuthorizationError)
+            }
+            _ => {
+                bail!(ErrorKind::LimitError) // status 456
+            }
+        },
         Ok(response) => {
             let status = response.status();
             match response.json::<ServerErrorMessage>().await {
@@ -73,18 +77,18 @@ error_chain! {
         Transport(reqwest::Error);
     }
     errors {
-        /// Indicates that the provided API key was refused by the DeepL server.
         AuthorizationError {
             description("Authorization failed, is your API key correct?")
             display("Authorization failed, is your API key correct?")
         }
-        /// An error occurred on the server side when processing a request. If possible, details
-        /// will be provided in the error message.
+        LimitError {
+            description("token limit over failed")
+            display("Limit over failed")
+        }
         ServerError(message: String) {
             description("An error occurred while communicating with the DeepL server.")
             display("An error occurred while communicating with the DeepL server: '{}'.", message)
         }
-        /// An error occurred on the client side when deserializing the response data.
         DeserializationError {
             description("An error occurred while deserializing the response data.")
             display("An error occurred while deserializing the response data.")

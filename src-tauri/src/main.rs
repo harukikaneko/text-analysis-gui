@@ -15,6 +15,9 @@ mod usecase;
 
 #[tokio::main]
 async fn main() {
+    tracing_subscriber::fmt()
+        .with_max_level(tracing::Level::INFO)
+        .init();
     let ip_db_pool = create_pool().await;
     DB_POOL.set(ip_db_pool).unwrap();
 

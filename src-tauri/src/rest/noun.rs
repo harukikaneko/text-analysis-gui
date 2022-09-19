@@ -14,11 +14,19 @@ pub async fn counts_by_noun(
 ) -> Result<Vec<CountsByNoun>, String> {
     let tokens = match usecase::token::get_tokens(text, dictionary_path, user_dictionary) {
         Ok(tokens) => tokens,
-        Err(err) => return Err(format!("failed to tokens {}", err)),
+        Err(err) => {
+            return {
+                tracing::error!("{:?}", err);
+                Err(format!("failed to tokens {:?}", err))
+            }
+        }
     };
     match usecase::noun::aggregate_group_by_noun(tokens) {
         Ok(items) => Ok(items),
-        Err(err) => Err(format!("failed to {}", err)),
+        Err(err) => {
+            tracing::error!("{:?}", err);
+            Err(format!("failed to {:?}", err))
+        }
     }
 }
 
@@ -30,18 +38,31 @@ pub async fn counts_of_nouns_by_year(
 ) -> Result<Vec<CountsOfNounsByYear>, String> {
     let csv_list = match usecase::csv::read_csv(csv_path).await {
         Ok(csv) => csv,
-        Err(err) => return Err(format!("Failed csv {}", err)),
+        Err(err) => {
+            return {
+                tracing::error!("{:?}", err);
+                Err(format!("Failed csv {:?}", err))
+            }
+        }
     };
 
     let aggregate_target =
         match get_tokens_by_year_handles_join(csv_list, dictionary_path, user_dictionary).await {
             Ok(v) => v,
-            Err(err) => return Err(format!("failed to tokens {}", err)),
+            Err(err) => {
+                return {
+                    tracing::error!("{:?}", err);
+                    Err(format!("failed to tokens {:?}", err))
+                }
+            }
         };
 
     match usecase::noun::aggregate_counts_of_nouns_by_year(aggregate_target) {
         Ok(items) => Ok(items),
-        Err(err) => Err(format!("failed to {}", err)),
+        Err(err) => {
+            tracing::error!("{:?}", err);
+            Err(format!("failed to {:?}", err))
+        }
     }
 }
 
@@ -53,12 +74,22 @@ pub async fn create_of_nouns_by_year(
 ) -> Result<(), String> {
     let csv_list = match usecase::csv::read_csv(csv_path).await {
         Ok(csv) => csv,
-        Err(err) => return Err(format!("Failed csv {}", err)),
+        Err(err) => {
+            return {
+                tracing::error!("{:?}", err);
+                Err(format!("Failed csv {:?}", err))
+            }
+        }
     };
 
     let translated_csv = match usecase::translate::texts_translate(csv_list).await {
         Ok(translated) => translated,
-        Err(err) => return Err(format!("Failed translate {}", err)),
+        Err(err) => {
+            return {
+                tracing::error!("{:?}", err);
+                Err(format!("Failed translate {:?}", err))
+            }
+        }
     };
 
     let create_target =
@@ -66,12 +97,20 @@ pub async fn create_of_nouns_by_year(
             .await
         {
             Ok(v) => v,
-            Err(err) => return Err(format!("failed to tokens {}", err)),
+            Err(err) => {
+                return {
+                    tracing::error!("{:?}", err);
+                    Err(format!("failed to tokens {:?}", err))
+                }
+            }
         };
 
     match usecase::noun::create_of_nouns_by_year(create_target).await {
         Ok(_) => Ok(()),
-        Err(err) => Err(format!("failed to {}", err)),
+        Err(err) => {
+            tracing::error!("{:?}", err);
+            Err(format!("failed to {:?}", err))
+        }
     }
 }
 

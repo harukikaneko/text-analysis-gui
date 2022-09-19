@@ -89,9 +89,7 @@ mod test {
             },
             TextWithYear {
                 year: 2022,
-                r#abstract: Text(
-                    "Advanced DCBS特有の課題:リソースの組織化".into(),
-                ),
+                r#abstract: Text("Advanced DCBS特有の課題:リソースの組織化".into()),
             },
         ]);
 
