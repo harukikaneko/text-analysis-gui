@@ -68,4 +68,34 @@ mod test {
         let actual = texts_translate(texts).await.unwrap();
         assert_eq!(expected, actual)
     }
+
+    #[tokio::test]
+    async fn test_texts_translate_not_include_en_text() {
+        let expected = TextWithYears(vec![
+            TextWithYear {
+                year: 2022,
+                r#abstract: Text("東京スカイツリー".into()),
+            },
+            TextWithYear {
+                year: 2022,
+                r#abstract: Text("Advanced DCBS特有の課題:リソースの組織化".into()),
+            },
+        ]);
+
+        let texts = TextWithYears(vec![
+            TextWithYear {
+                year: 2022,
+                r#abstract: Text("東京スカイツリー".into()),
+            },
+            TextWithYear {
+                year: 2022,
+                r#abstract: Text(
+                    "Advanced DCBS特有の課題:リソースの組織化".into(),
+                ),
+            },
+        ]);
+
+        let actual = texts_translate(texts).await.unwrap();
+        assert_eq!(expected, actual)
+    }
 }
