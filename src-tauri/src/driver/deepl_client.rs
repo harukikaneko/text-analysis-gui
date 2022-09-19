@@ -9,15 +9,13 @@ pub async fn translate_to_ja(query: &Vec<(String, String)>) -> anyhow::Result<Tr
     let url = "https://api-free.deepl.com/v2/translate".to_string();
     let client = reqwest::Client::new();
 
-    let payload = query.clone();
-
     let res = match client
         .post(&url)
         .header(
             "Authorization",
             format!("DeepL-Auth-Key {}", SETTINGS.deepl_token.clone()),
         )
-        .query(&payload)
+        .query(&query)
         .send()
         .await
     {
