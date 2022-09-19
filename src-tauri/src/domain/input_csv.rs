@@ -19,7 +19,7 @@ impl TextWithYears {
                 .into_iter()
                 .map(|group| TextWithYear {
                     year: group.0,
-                    r#abstract: Text(join_text(group.1)),
+                    text: Text(join_text(group.1)),
                 })
                 .collect_vec(),
         )
@@ -29,7 +29,7 @@ impl TextWithYears {
         Self(
             self.0
                 .into_iter()
-                .filter(|v| v.r#abstract.is_ascii_alphabet())
+                .filter(|v| v.text.is_ascii_alphabet())
                 .collect_vec(),
         )
     }
@@ -38,7 +38,7 @@ impl TextWithYears {
         Self(
             self.0
                 .into_iter()
-                .filter(|v| !v.r#abstract.is_ascii_alphabet())
+                .filter(|v| !v.text.is_ascii_alphabet())
                 .collect_vec(),
         )
     }
@@ -56,11 +56,7 @@ impl TextWithYears {
 }
 
 fn join_text(array: Vec<TextWithYear>) -> String {
-    array
-        .into_iter()
-        .map(|i| i.r#abstract.0)
-        .collect_vec()
-        .join("")
+    array.into_iter().map(|i| i.text.0).collect_vec().join("")
 }
 
 #[cfg(test)]
@@ -71,17 +67,17 @@ mod text_years_test {
     fn test_group_by_year() {
         let expected = TextWithYears(vec![TextWithYear {
             year: 2022,
-            r#abstract: Text("東京スカイツリー東京".into()),
+            text: Text("東京スカイツリー東京".into()),
         }]);
 
         let target = TextWithYears(vec![
             TextWithYear {
                 year: 2022,
-                r#abstract: Text("東京スカイツリー".into()),
+                text: Text("東京スカイツリー".into()),
             },
             TextWithYear {
                 year: 2022,
-                r#abstract: Text("東京".into()),
+                text: Text("東京".into()),
             },
         ]);
 
@@ -95,11 +91,11 @@ mod text_years_test {
         let target = vec![
             TextWithYear {
                 year: 2022,
-                r#abstract: Text("東京スカイツリー".into()),
+                text: Text("東京スカイツリー".into()),
             },
             TextWithYear {
                 year: 2022,
-                r#abstract: Text("東京".into()),
+                text: Text("東京".into()),
             },
         ];
 
@@ -112,19 +108,17 @@ mod text_years_test {
         let target = TextWithYears(vec![
             TextWithYear {
                 year: 2022,
-                r#abstract: Text("東京スカイツリー".into()),
+                text: Text("東京スカイツリー".into()),
             },
             TextWithYear {
                 year: 2022,
-                r#abstract: Text(
-                    "Advanced DCBSpecific Challenge:The organisation of resources".into(),
-                ),
+                text: Text("Advanced DCBSpecific Challenge:The organisation of resources".into()),
             },
         ]);
 
         let expected = TextWithYears(vec![TextWithYear {
             year: 2022,
-            r#abstract: Text("Advanced DCBSpecific Challenge:The organisation of resources".into()),
+            text: Text("Advanced DCBSpecific Challenge:The organisation of resources".into()),
         }]);
 
         assert_eq!(target.filter_en_abstract(), expected)
@@ -135,19 +129,17 @@ mod text_years_test {
         let target = TextWithYears(vec![
             TextWithYear {
                 year: 2022,
-                r#abstract: Text("東京スカイツリー".into()),
+                text: Text("東京スカイツリー".into()),
             },
             TextWithYear {
                 year: 2022,
-                r#abstract: Text(
-                    "Advanced DCBSpecific Challenge:The organisation of resources".into(),
-                ),
+                text: Text("Advanced DCBSpecific Challenge:The organisation of resources".into()),
             },
         ]);
 
         let expected = TextWithYears(vec![TextWithYear {
             year: 2022,
-            r#abstract: Text("東京スカイツリー".into()),
+            text: Text("東京スカイツリー".into()),
         }]);
 
         assert_eq!(target.exclude_en_abstract(), expected)
@@ -157,7 +149,7 @@ mod text_years_test {
     fn test_is_exists_en_abstract() {
         assert!(TextWithYears(vec![TextWithYear {
             year: 2022,
-            r#abstract: Text("Advanced DCBSpecific Challenge:The organisation of resources".into()),
+            text: Text("Advanced DCBSpecific Challenge:The organisation of resources".into()),
         }])
         .is_exists_en_abstract())
     }
@@ -172,22 +164,22 @@ mod text_years_test {
         let expected = TextWithYears(vec![
             TextWithYear {
                 year: 2022,
-                r#abstract: Text("東京スカイツリー".into()),
+                text: Text("東京スカイツリー".into()),
             },
             TextWithYear {
                 year: 2022,
-                r#abstract: Text("東京".into()),
+                text: Text("東京".into()),
             },
         ]);
 
         let target = TextWithYears(vec![TextWithYear {
             year: 2022,
-            r#abstract: Text("東京スカイツリー".into()),
+            text: Text("東京スカイツリー".into()),
         }]);
 
         let input_items = TextWithYears(vec![TextWithYear {
             year: 2022,
-            r#abstract: Text("東京".into()),
+            text: Text("東京".into()),
         }]);
 
         assert_eq!(target.push_items(input_items), expected)
@@ -197,7 +189,7 @@ mod text_years_test {
 #[derive(Debug, Clone, Deserialize, PartialEq, Eq)]
 pub struct TextWithYear {
     pub year: usize,
-    pub r#abstract: Text,
+    pub text: Text,
 }
 
 #[derive(Debug, Clone, Deserialize, PartialEq, Eq)]

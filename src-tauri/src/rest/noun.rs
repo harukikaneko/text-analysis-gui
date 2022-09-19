@@ -1,8 +1,6 @@
 use tauri::command;
 
-use crate::domain::{CountsByNoun, CountsOfNounsByYear, TextWithYears, Tokens};
-use futures::future::try_join_all;
-use itertools::Itertools;
+use crate::domain::{CountsByNoun, CountsOfNounsByYear};
 
 use crate::usecase;
 
@@ -46,16 +44,21 @@ pub async fn counts_of_nouns_by_year(
         }
     };
 
-    let aggregate_target =
-        match get_tokens_by_year_handles_join(csv_list, dictionary_path, user_dictionary).await {
-            Ok(v) => v,
-            Err(err) => {
-                return {
-                    tracing::error!("{:?}", err);
-                    Err(format!("failed to tokens {:?}", err))
-                }
+    let aggregate_target = match usecase::token::get_tokens_by_year_handles_join(
+        csv_list,
+        dictionary_path,
+        user_dictionary,
+    )
+    .await
+    {
+        Ok(v) => v,
+        Err(err) => {
+            return {
+                tracing::error!("{:?}", err);
+                Err(format!("failed to tokens {:?}", err))
             }
-        };
+        }
+    };
 
     match usecase::noun::aggregate_counts_of_nouns_by_year(aggregate_target) {
         Ok(items) => Ok(items),
@@ -92,18 +95,21 @@ pub async fn create_of_nouns_by_year(
         }
     };
 
-    let create_target =
-        match get_tokens_by_year_handles_join(translated_csv, dictionary_path, user_dictionary)
-            .await
-        {
-            Ok(v) => v,
-            Err(err) => {
-                return {
-                    tracing::error!("{:?}", err);
-                    Err(format!("failed to tokens {:?}", err))
-                }
+    let create_target = match usecase::token::get_tokens_by_year_handles_join(
+        translated_csv,
+        dictionary_path,
+        user_dictionary,
+    )
+    .await
+    {
+        Ok(v) => v,
+        Err(err) => {
+            return {
+                tracing::error!("{:?}", err);
+                Err(format!("failed to tokens {:?}", err))
             }
-        };
+        }
+    };
 
     match usecase::noun::create_of_nouns_by_year(create_target).await {
         Ok(_) => Ok(()),
@@ -111,67 +117,5 @@ pub async fn create_of_nouns_by_year(
             tracing::error!("{:?}", err);
             Err(format!("failed to {:?}", err))
         }
-    }
-}
-
-async fn get_tokens_by_year_handles_join(
-    csv_list: TextWithYears,
-    dictionary_path: Option<String>,
-    user_dictionary: Option<String>,
-) -> anyhow::Result<Vec<(usize, Tokens)>> {
-    let handles = csv_list
-        .group_by_year()
-        .0
-        .into_iter()
-        .map(|v| {
-            usecase::token::get_tokens_by_year(
-                v.year,
-                v.r#abstract.0,
-                &dictionary_path,
-                &user_dictionary,
-            )
-        })
-        .collect_vec();
-
-    try_join_all(handles).await
-}
-
-#[cfg(test)]
-mod test {
-    use crate::{
-        domain::{Text, TextWithYear},
-        usecase::token::{get_tokens_by_year, mock_get_tokens_by_year},
-    };
-
-    use super::*;
-
-    #[tokio::test]
-    #[mry::lock(get_tokens_by_year)]
-    async fn test_get_tokens_by_year_handles_join() {
-        let expected = vec![(2022, Tokens(vec![])), (2021, Tokens(vec![]))];
-
-        let csv_list = TextWithYears(vec![
-            TextWithYear {
-                year: 2022,
-                r#abstract: Text("".into()),
-            },
-            TextWithYear {
-                year: 2021,
-                r#abstract: Text("".into()),
-            },
-        ]);
-        let dictionary_path = Some("".into());
-        let user_dictionary = Some("".into());
-
-        mock_get_tokens_by_year(2021, "", dictionary_path.clone(), user_dictionary.clone())
-            .returns_with(move |_, _, _, _| Ok((2021, Tokens(vec![]))));
-        mock_get_tokens_by_year(2022, "", dictionary_path.clone(), user_dictionary.clone())
-            .returns_with(move |_, _, _, _| Ok((2022, Tokens(vec![]))));
-
-        let actual = get_tokens_by_year_handles_join(csv_list, dictionary_path, user_dictionary)
-            .await
-            .unwrap();
-
-        assert_eq!(actual, expected)
     }
 }

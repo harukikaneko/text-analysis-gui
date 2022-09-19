@@ -12,7 +12,7 @@ pub async fn translate_en_text(text: Text, year: usize) -> anyhow::Result<TextWi
     let translated = driver::deepl_client::translate_to_ja(&query).await?;
     Ok(TextWithYear {
         year,
-        r#abstract: Text(translated.translations[0].clone().text),
+        text: Text(translated.translations[0].clone().text),
     })
 }
 
@@ -29,7 +29,7 @@ mod test {
     async fn test_translate_en_text() {
         let expected = TextWithYear {
             year: 2022,
-            r#abstract: Text("Advanced DCBS特有の課題:リソースの組織化".into()),
+            text: Text("Advanced DCBS特有の課題:リソースの組織化".into()),
         };
 
         let query = vec![

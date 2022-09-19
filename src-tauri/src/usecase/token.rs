@@ -1,9 +1,10 @@
+use futures::future::try_join_all;
 use itertools::Itertools;
 use lindera::{tokenizer::Tokenizer, LinderaResult};
 
 use crate::{
     config::dictionary_setup,
-    domain::{Detail, Token, Tokens, Word},
+    domain::{Detail, TextWithYears, Token, Tokens, Word},
 };
 
 pub fn get_tokens(
@@ -25,6 +26,21 @@ pub fn get_tokens(
     Ok(Tokens(tokens))
 }
 
+pub async fn get_tokens_by_year_handles_join(
+    csv_list: TextWithYears,
+    dictionary_path: Option<String>,
+    user_dictionary: Option<String>,
+) -> anyhow::Result<Vec<(usize, Tokens)>> {
+    let handles = csv_list
+        .group_by_year()
+        .0
+        .into_iter()
+        .map(|v| get_tokens_by_year(v.year, v.text.0, &dictionary_path, &user_dictionary))
+        .collect_vec();
+
+    try_join_all(handles).await
+}
+
 #[mry::mry]
 pub async fn get_tokens_by_year(
     year: usize,
@@ -43,7 +59,10 @@ mod test {
         tokenizer::{DictionaryConfig, DictionaryKind, TokenizerConfig},
     };
 
-    use crate::config::mock_dictionary_setup;
+    use crate::{
+        config::mock_dictionary_setup,
+        domain::{Text, TextWithYear},
+    };
 
     use super::*;
 
@@ -97,6 +116,30 @@ mod test {
         mock_dictionary_setup(None, None).returns(config);
 
         assert_eq!(get_tokens(word, None, None).unwrap(), expected)
+    }
+
+    #[tokio::test]
+    #[mry::lock(get_tokens_by_year)]
+    async fn test_get_tokens_by_year_handles_join() {
+        let expected = vec![(2022, Tokens(vec![]))];
+
+        let csv_list = TextWithYears(vec![
+            TextWithYear {
+                year: 2022,
+                text: Text("".into()),
+            }
+        ]);
+        let dictionary_path = Some("".into());
+        let user_dictionary = Some("".into());
+
+        mock_get_tokens_by_year(2022, "", dictionary_path.clone(), user_dictionary.clone())
+            .returns_with(move |_, _, _, _| Ok((2022, Tokens(vec![]))));
+
+        let actual = get_tokens_by_year_handles_join(csv_list, dictionary_path, user_dictionary)
+            .await
+            .unwrap();
+
+        assert_eq!(actual, expected)
     }
 
     #[tokio::test]

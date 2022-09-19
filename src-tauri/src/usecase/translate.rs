@@ -9,7 +9,7 @@ pub async fn texts_translate(texts: TextWithYears) -> anyhow::Result<TextWithYea
         let handles = filter_en
             .0
             .into_iter()
-            .map(|v| gateway::translate::translate_en_text(v.r#abstract, v.year))
+            .map(|v| gateway::translate::translate_en_text(v.text, v.year))
             .collect_vec();
 
         let translate_text = TextWithYears(try_join_all(handles).await?);
@@ -33,30 +33,28 @@ mod test {
         let expected = TextWithYears(vec![
             TextWithYear {
                 year: 2022,
-                r#abstract: Text("東京スカイツリー".into()),
+                text: Text("東京スカイツリー".into()),
             },
             TextWithYear {
                 year: 2022,
-                r#abstract: Text("Advanced DCBS特有の課題:リソースの組織化".into()),
+                text: Text("Advanced DCBS特有の課題:リソースの組織化".into()),
             },
         ]);
 
         let texts = TextWithYears(vec![
             TextWithYear {
                 year: 2022,
-                r#abstract: Text("東京スカイツリー".into()),
+                text: Text("東京スカイツリー".into()),
             },
             TextWithYear {
                 year: 2022,
-                r#abstract: Text(
-                    "Advanced DCBSpecific Challenge:The organisation of resources".into(),
-                ),
+                text: Text("Advanced DCBSpecific Challenge:The organisation of resources".into()),
             },
         ]);
 
         let translated = TextWithYear {
             year: 2022,
-            r#abstract: Text("Advanced DCBS特有の課題:リソースの組織化".into()),
+            text: Text("Advanced DCBS特有の課題:リソースの組織化".into()),
         };
 
         mock_translate_en_text(
@@ -74,22 +72,22 @@ mod test {
         let expected = TextWithYears(vec![
             TextWithYear {
                 year: 2022,
-                r#abstract: Text("東京スカイツリー".into()),
+                text: Text("東京スカイツリー".into()),
             },
             TextWithYear {
                 year: 2022,
-                r#abstract: Text("Advanced DCBS特有の課題:リソースの組織化".into()),
+                text: Text("Advanced DCBS特有の課題:リソースの組織化".into()),
             },
         ]);
 
         let texts = TextWithYears(vec![
             TextWithYear {
                 year: 2022,
-                r#abstract: Text("東京スカイツリー".into()),
+                text: Text("東京スカイツリー".into()),
             },
             TextWithYear {
                 year: 2022,
-                r#abstract: Text("Advanced DCBS特有の課題:リソースの組織化".into()),
+                text: Text("Advanced DCBS特有の課題:リソースの組織化".into()),
             },
         ]);
 
