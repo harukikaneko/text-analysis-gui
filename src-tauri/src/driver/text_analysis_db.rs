@@ -9,6 +9,8 @@ pub async fn bulk_insert(year: usize, nouns: Vec<String>) -> anyhow::Result<()> 
         v2.push(i);
     });
 
+    let mut tx = DB_POOL.get().unwrap().begin().await?;
+
     sqlx::query(
         r#"
             INSERT INTO nouns (year, noun)
@@ -18,9 +20,11 @@ pub async fn bulk_insert(year: usize, nouns: Vec<String>) -> anyhow::Result<()> 
     )
     .bind(&v1)
     .bind(&v2)
-    .execute(DB_POOL.get().unwrap())
+    .execute(&mut tx)
     .await
     .map_err(|e| anyhow::anyhow!("error insert {:?}", e))?;
+
+    tx.commit().await?;
 
     Ok(())
 }
